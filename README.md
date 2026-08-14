@@ -1,7 +1,5 @@
 # Cloudflare Solver
 
-Telegram: By @B00H0. Updates on @HK407.
-
 Solve Turnstile challenges and IUAM with real headless Chrome, raw CDP (no driver, no node),
 zero Rust dependencies. One ~800 KB binary, hands you back a `1.` token or a `cf_clearance`
 cookie.
@@ -127,3 +125,7 @@ throughput climbs ~linearly with cores.
 ## License
 
 MIT. See LICENSE.
+
+---
+
+By @B00H0. Updates on Telegram: @HK407.
