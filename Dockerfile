@@ -1,16 +1,23 @@
-FROM --platform=linux/amd64 debian:bookworm-slim AS build
+FROM debian:bookworm-slim AS build
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl ca-certificates build-essential pkg-config \
+RUN apt-get update && (apt-get install -y --no-install-recommends \
+    curl ca-certificates build-essential pkg-config gcc-x86-64-linux-gnu libc6-dev-amd64-cross \
+    || apt-get install -y --no-install-recommends curl ca-certificates build-essential pkg-config) \
     && rm -rf /var/lib/apt/lists/*
+
+RUN if ! command -v x86_64-linux-gnu-gcc >/dev/null 2>&1; then ln -s "$(command -v gcc)" /usr/local/bin/x86_64-linux-gnu-gcc; fi
 
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.80.0 --profile minimal
 ENV PATH="/root/.cargo/bin:${PATH}"
 
+RUN rustup target add x86_64-unknown-linux-gnu
+
 WORKDIR /src
 COPY Cargo.toml Cargo.lock ./
 COPY src ./src
-RUN cargo build --release
+
+ENV CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=x86_64-linux-gnu-gcc
+RUN cargo build --release --target x86_64-unknown-linux-gnu
 
 FROM --platform=linux/amd64 debian:bookworm-slim
 
@@ -33,7 +40,7 @@ RUN set -eux; \
     mv /app/chrome-linux64 /app/chrome; \
     rm /tmp/c.zip
 
-COPY --from=build /src/target/release/turnstile-solver /app/turnstile-solver
+COPY --from=build /src/target/x86_64-unknown-linux-gnu/release/turnstile-solver /app/turnstile-solver
 COPY --from=build /src/src/devices.json /app/src/devices.json
 COPY --from=build /src/src/devices.json /app/devices.json
 
