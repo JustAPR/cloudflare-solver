@@ -23,15 +23,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-RUN set -eux; \
-    URL=$(curl -fsSL --retry 5 --retry-all-errors --retry-delay 3 --connect-timeout 30 \
-      https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json \
-      | grep -o 'https://storage.googleapis.com/chrome-for-testing-public/[^"]*linux64/chrome-linux64.zip' | head -n1); \
-    test -n "$URL"; \
-    curl -fL --retry 5 --retry-all-errors --retry-delay 3 --connect-timeout 30 -o /tmp/c.zip "$URL"; \
-    unzip -q /tmp/c.zip -d /app; \
-    mv /app/chrome-linux64 /app/chrome; \
-    rm /tmp/c.zip
+RUN curl -fL \
+    -o /tmp/google-chrome.deb \
+    "https://dl.google.com/linux/direct/google-chrome-stable_current_arm64.deb" \
+    && apt-get update \
+    && apt-get install -y /tmp/google-chrome.deb \
+    && rm -f /tmp/google-chrome.deb \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /src/target/release/turnstile-solver /app/turnstile-solver
 COPY --from=build /src/src/devices.json /app/src/devices.json
