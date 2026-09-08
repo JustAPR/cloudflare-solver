@@ -45,4 +45,4 @@ ENV CHROME_BIN=/usr/bin/google-chrome
 
 EXPOSE 407
 
-CMD ["/app/turnstile-solver]
+CMD ["/app/turnstile-solver"]
