@@ -2,7 +2,6 @@ services:
   solver:
     build: .
     image: turnstile-solver
-    platform: linux/amd64
     ports:
       - "407:407"
     restart: unless-stopped
