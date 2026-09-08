@@ -22,10 +22,11 @@ RUN cargo build --release --target x86_64-unknown-linux-gnu
 FROM --platform=linux/amd64 debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl unzip ca-certificates fonts-liberation \
+    curl unzip ca-certificates fonts-liberation fonts-noto-color-emoji \
     libnss3 libnspr4 libdbus-1-3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
     libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libpango-1.0-0 \
     libcairo2 libasound2 libxshmfence1 libx11-xcb1 libxkbcommon0 \
+    libgl1 libglx-mesa0 libegl1 mesa-vulkan-drivers libvulkan1 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
