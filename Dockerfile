@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim AS build
+FROM --platform=linux/amd64 debian:bookworm-slim AS build
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl ca-certificates build-essential pkg-config \
@@ -12,10 +12,10 @@ COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 RUN cargo build --release
 
-FROM debian:bookworm-slim
+FROM --platform=linux/amd64 debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl ca-certificates fonts-liberation \
+    curl unzip ca-certificates fonts-liberation \
     libnss3 libnspr4 libdbus-1-3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
     libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libpango-1.0-0 \
     libcairo2 libasound2 libxshmfence1 libx11-xcb1 libxkbcommon0 \
@@ -23,25 +23,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Install Google Chrome for current architecture (arm64 or amd64)
 RUN set -eux; \
-    ARCH=$(dpkg --print-architecture); \
-    if [ "$ARCH" = "arm64" ]; then \
-        CHROME_DEB="google-chrome-stable_current_arm64.deb"; \
-    elif [ "$ARCH" = "amd64" ]; then \
-        CHROME_DEB="google-chrome-stable_current_amd64.deb"; \
-    else \
-        echo "Unsupported architecture: $ARCH" && exit 1; \
-    fi; \
-    curl -fL -o /tmp/google-chrome.deb "https://dl.google.com/linux/direct/${CHROME_DEB}"; \
-    apt-get update && apt-get install -y /tmp/google-chrome.deb; \
-    rm -f /tmp/google-chrome.deb; \
-    rm -rf /var/lib/apt/lists/*
+    URL=$(curl -fsSL --retry 5 --retry-all-errors --retry-delay 3 --connect-timeout 30 \
+      https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json \
+      | grep -o 'https://storage.googleapis.com/chrome-for-testing-public/[^"]*linux64/chrome-linux64.zip' | head -n1); \
+    test -n "$URL"; \
+    curl -fL --retry 5 --retry-all-errors --retry-delay 3 --connect-timeout 30 -o /tmp/c.zip "$URL"; \
+    unzip -q /tmp/c.zip -d /app; \
+    mv /app/chrome-linux64 /app/chrome; \
+    rm /tmp/c.zip
 
 COPY --from=build /src/target/release/turnstile-solver /app/turnstile-solver
 COPY --from=build /src/src/devices.json /app/src/devices.json
 COPY --from=build /src/src/devices.json /app/devices.json
 
-ENV CHROME_BIN=/usr/bin/google-chrome
+ENV CHROME_BIN=/app/chrome/chrome
 EXPOSE 407
 CMD ["/app/turnstile-solver"]
