@@ -5,7 +5,7 @@ zero Rust dependencies. One ~800 KB binary, hands you back a `1.` token or a `cf
 cookie.
 
 Solves Turnstile tokens and IUAM; for the Cloudflare managed-challenge interstitial, use
-[CF-Managed](https://github.com/B00H0O/CF-Managed) instead.
+[Cloudflare-challenge](https://github.com/B00H0O/Cloudflare-challenge) instead.
 
 ## Turnstile
 
