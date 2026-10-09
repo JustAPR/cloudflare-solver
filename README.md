@@ -128,7 +128,3 @@ throughput climbs ~linearly with cores.
 ## License
 
 MIT. See LICENSE.
-
----
-
-By @B00H0. Updates on Telegram: @HK407.
