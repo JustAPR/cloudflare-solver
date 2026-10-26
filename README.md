@@ -4,6 +4,9 @@ Solve Turnstile challenges and IUAM with real headless Chrome, raw CDP (no drive
 zero Rust dependencies. One ~800 KB binary, hands you back a `1.` token or a `cf_clearance`
 cookie.
 
+Solves Turnstile tokens and IUAM; for the Cloudflare managed-challenge interstitial, use
+[Cloudflare-challenge](https://github.com/B00H0O/Cloudflare-challenge) instead.
+
 ## Turnstile
 
 ```
@@ -125,7 +128,3 @@ throughput climbs ~linearly with cores.
 ## License
 
 MIT. See LICENSE.
-
----
-
-By @B00H0. Updates on Telegram: @HK407.
